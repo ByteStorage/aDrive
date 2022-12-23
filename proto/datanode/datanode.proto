@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package datanode;
+option go_package = "./proto/datanode";
+
+service DataNode {
+  rpc Ping(PingReq) returns (PingResp){}
+  rpc HeartBeat(HeartBeatReq) returns (HeartBeatResp){}
+  rpc Put(PutReq) returns (PutResp){}
+  rpc Get(GetReq) returns (GetResp){}
+  rpc Delete(DeleteReq) returns (DeleteResp){}
+  rpc Stat(StatReq) returns (StatResp){}
+  rpc List(ListReq) returns (ListResp){}
+  rpc Rename(RenameReq) returns (RenameResp){}
+  rpc Mkdir(MkdirReq) returns (MkdirResp){}
+
+  //rpc 方法名(请求体) returns （响应体）{}
+  //message 结构体（请求体或者响应体）{
+  //    string 请求参数1 = 1;
+  //    bool   请求参数2 = 2;
+  //    repeated 请求结构体 请求参数3 = 3;(定义数组）
+  //    int 同样
+  // }
+}
+
+message StatReq {
+  string BlockId = 1;
+  string PrePath = 2;
+}
+
+message StatResp {
+  int64 Size = 1;
+  int64 ModTime = 2;
+  string Name = 3;
+  string Mode = 4;
+}
+
+message DeleteReq {
+  string BlockId = 1;
+  string PrePath = 2;
+}
+
+message DeleteResp {
+  bool Success = 1;
+}
+
+message PingReq {
+  string Host = 1;
+  uint32 Port = 2;
+}
+
+message PingResp {
+  bool Success = 1;
+}
+
+message HeartBeatReq {
+  bool Request = 1;
+}
+
+message HeartBeatResp{
+  bool Success = 1;
+  uint64 UsedDisk = 2;
+  uint64 UsedMem = 3;
+  float CpuPercent = 4;
+  uint64 TotalMem = 5;
+  uint64 TotalDisk = 6;
+}
+
+message PutReq {
+  string AbsolutePath = 1;
+  bytes Data = 2;
+}
+
+message DataNodeInstance {
+  string Host = 1;
+  string ServicePort = 2;
+}
+
+message PutResp {
+  bool Success = 1;
+}
+
+message GetReq {
+  string prePath = 2;
+  string BlockId = 1;
+}
+
+message GetResp {
+  bytes Data = 1;
+}
+
+message RenameReq {
+  string OldPath = 1;
+  string NewPath = 2;
+}
+
+message RenameResp {
+  bool Success = 1;
+}
+
+message MkdirReq {
+  string Path = 1;
+}
+
+message MkdirResp {
+  bool Success = 1;
+}
+
+message ListReq {
+  string Path = 1;
+}
+
+message ListResp {
+  repeated string FileList = 1;
+  repeated string DirList = 2;
+}

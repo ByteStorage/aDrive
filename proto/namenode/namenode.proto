@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package namenode_;
+option go_package = 	"go-fs/proto/namenode";
+
+service NameNodeService {
+
+  rpc HeartBeat(HeartBeatReq) returns (HeartBeatResp);
+  rpc RegisterDataNode(RegisterDataNodeReq) returns (RegisterDataNodeResp);
+  rpc JoinCluster(JoinClusterReq) returns (JoinClusterResp);
+  rpc FindLeader(FindLeaderReq) returns (FindLeaderResp);
+  rpc UpdateDataNodeMessage(UpdateDataNodeMessageReq) returns (UpdateDataNodeMessageResp);
+  rpc Put(PutReq) returns (PutResp);
+}
+
+message PutReq {
+  bytes data = 1;
+  string absolutePath = 2;
+}
+
+message PutResp {
+  string AbsolutePath = 1;
+  repeated DataMessage DataMessage = 2;
+}
+
+message FindLeaderReq {
+}
+
+message FindLeaderResp {
+  string Addr = 1;
+}
+
+message JoinClusterReq {
+  string Id = 1;
+  string Addr = 2;
+  uint64 PreviousIndex = 3;
+}
+
+message JoinClusterResp{
+  bool Success = 1;
+}
+
+message UpdateDataNodeMessageReq {
+  string Addr = 1;
+  uint64 UsedDisk = 2;
+  uint64 UsedMem = 3;
+  float CpuPercent = 4;
+  uint64 TotalMem = 5;
+  uint64 TotalDisk = 6;
+}
+
+message UpdateDataNodeMessageResp {
+  bool Success = 1;
+}
+
+message RegisterDataNodeReq{
+  string Addr = 1;
+  uint64 UsedDisk = 2;
+  uint64 UsedMem = 3;
+  float CpuPercent = 4;
+  uint64 TotalMem = 5;
+  uint64 TotalDisk = 6;
+}
+
+message RegisterDataNodeResp {
+  bool Success = 1;
+}
+
+message HeartBeatReq {
+  string Addr = 1;
+}
+
+message HeartBeatResp {
+  bool Success = 1;
+}
+
+message DataMessage {
+  int64 Id = 1;
+  string host = 2;
+}

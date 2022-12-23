@@ -1,0 +1,6 @@
+2022-12-22T15:47:31.318+0800	INFO	aDrive/main.go:25	info
+2022-12-22T15:47:31.334+0800	WARN	aDrive/main.go:26	warn
+2022-12-22T15:47:31.334+0800	ERROR	aDrive/main.go:27	error
+2022-12-22T15:47:31.334+0800	INFO	aDrive/main.go:29	Info
+2022-12-22T15:47:31.334+0800	WARN	aDrive/main.go:30	Warn
+2022-12-22T15:47:31.334+0800	ERROR	aDrive/main.go:31	Error
