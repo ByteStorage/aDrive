@@ -578,7 +578,7 @@ func ShowDashboard(c *gin.Context) {
 }
 
 func initDatabase() {
-	db, err := gorm.Open(mysql.Open("root:sjc6152080@@tcp(rm-bp174a71r34zvr0v8mo.mysql.rds.aliyuncs.com:3306)/aDrive?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(""), &gorm.Config{})
 	if err != nil {
 		panic("application start fail")
 	}
