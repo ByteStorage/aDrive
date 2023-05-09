@@ -10,3 +10,73 @@
 2022-12-22T15:49:59.653+0800	ERROR	aDrive/main.go:25	Error
 2022-12-22T15:50:07.236+0800	ERROR	aDrive/main.go:21	error
 2022-12-22T15:50:07.236+0800	ERROR	aDrive/main.go:25	Error
+2023-03-27T13:10:33.140+0800	ERROR	utils/utils.go:51	read file error:  	{"error": "open 问题.docx: The system cannot find the file specified."}
+2023-03-27T13:50:54.011+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T13:51:07.727+0800	ERROR	datanode/get.go:15	read file erroropen data3/\文献的XPS数据.xlsx0: The system cannot find the file specified.
+2023-03-27T13:51:07.729+0800	ERROR	datanode/get.go:15	read file erroropen data2/\文献的XPS数据.xlsx1: The system cannot find the file specified.
+2023-03-27T13:51:07.730+0800	ERROR	datanode/get.go:15	read file erroropen data1/\文献的XPS数据.xlsx2: The system cannot find the file specified.
+2023-03-27T13:51:07.731+0800	ERROR	utils/utils.go:51	reconstruct error:  	{"error": "no shard data"}
+2023-03-27T13:52:18.980+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T13:52:25.659+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T14:04:02.308+0800	ERROR	utils/utils.go:51	failed to listen:  	{"error": "listen tcp :7003: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted."}
+2023-03-27T14:04:51.318+0800	ERROR	datanode/get.go:15	read file erroropen data1/\论文1-0x.docx0: The system cannot find the file specified.
+2023-03-27T14:04:51.319+0800	ERROR	datanode/get.go:15	read file erroropen data3/\论文1-0x.docx1: The system cannot find the file specified.
+2023-03-27T14:04:51.320+0800	ERROR	datanode/get.go:15	read file erroropen data2/\论文1-0x.docx2: The system cannot find the file specified.
+2023-03-27T14:04:51.321+0800	ERROR	utils/utils.go:51	reconstruct error:  	{"error": "no shard data"}
+2023-03-27T14:24:06.986+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T14:42:46.579+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T14:44:28.542+0800	ERROR	datanode/datanode.go:168	there is no alive name node
+2023-03-27T14:44:30.908+0800	ERROR	datanode/datanode.go:168	there is no alive name node
+2023-03-27T14:44:33.212+0800	ERROR	datanode/datanode.go:168	there is no alive name node
+2023-03-27T14:53:07.344+0800	ERROR	datanode/put.go:17	create file erroropen data1/test/杭电论文格式要求0.pdf: The system cannot find the path specified.
+2023-03-27T14:53:07.345+0800	ERROR	utils/utils.go:51	put data to datanode(localhost:7001)::  	{"error": "rpc error: code = Unknown desc = create file error:open data1/test/杭电论文格式要求0.pdf: The system cannot find the path specified."}
+2023-03-27T14:53:35.127+0800	ERROR	datanode/put.go:17	create file erroropen data2/test/杭电论文格式要求0.pdf: The system cannot find the path specified.
+2023-03-27T14:53:35.127+0800	ERROR	utils/utils.go:51	put data to datanode(localhost:7002)::  	{"error": "rpc error: code = Unknown desc = create file error:open data2/test/杭电论文格式要求0.pdf: The system cannot find the path specified."}
+2023-03-27T14:58:57.164+0800	ERROR	utils/utils.go:51	decode param error:  	{"error": "invalid URL escape \"%2\\xe6\""}
+2023-03-27T14:58:57.168+0800	ERROR	utils/utils.go:51	decode param error:  	{"error": "invalid URL escape \"%2\\xe6\""}
+2023-03-27T14:59:00.964+0800	ERROR	utils/utils.go:51	decode param error:  	{"error": "invalid URL escape \"%2\\xe6\""}
+2023-03-27T14:59:57.613+0800	ERROR	utils/utils.go:51	decode param error:  	{"error": "invalid URL escape \"%2\\xe6\""}
+2023-03-27T14:59:57.616+0800	ERROR	utils/utils.go:51	decode param error:  	{"error": "invalid URL escape \"%2\\xe6\""}
+2023-03-27T15:00:00.634+0800	ERROR	utils/utils.go:51	decode param error:  	{"error": "invalid URL escape \"%2\\xe6\""}
+2023-03-27T15:11:15.471+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:11:15.475+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:11:15.529+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:11:49.064+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:11:49.068+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:11:49.124+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:13:09.352+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:13:09.356+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:13:09.405+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:15:09.712+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:15:09.716+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T15:15:09.768+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T17:04:21.876+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T17:04:31.820+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-27T17:05:46.349+0800	ERROR	utils/utils.go:51	reconstruct error:  	{"error": "too few shards given"}
+2023-03-27T17:07:58.671+0800	ERROR	utils/utils.go:51	get file error:  	{"error": "request Content-Type isn't multipart/form-data"}
+2023-03-27T17:08:47.258+0800	ERROR	utils/utils.go:51	get file error:  	{"error": "request Content-Type isn't multipart/form-data"}
+2023-03-27T17:09:10.328+0800	ERROR	utils/utils.go:51	get file error:  	{"error": "no multipart boundary param in Content-Type"}
+2023-03-27T17:13:41.631+0800	ERROR	utils/utils.go:51	get file error:  	{"error": "no multipart boundary param in Content-Type"}
+2023-03-27T17:14:50.713+0800	ERROR	utils/utils.go:51	get file error:  	{"error": "multipart: NextPart: EOF"}
+2023-03-27T17:19:24.841+0800	ERROR	utils/utils.go:51	get file error:  	{"error": "request Content-Type isn't multipart/form-data"}
+2023-03-27T17:23:22.922+0800	ERROR	utils/utils.go:51	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-29T21:32:10.255+0800	ERROR	datanode/datanode.go:168	there is no alive name node
+2023-03-29T21:32:13.557+0800	ERROR	datanode/datanode.go:168	there is no alive name node
+2023-03-29T21:32:15.624+0800	ERROR	datanode/datanode.go:168	there is no alive name node
+2023-03-29T21:32:17.526+0800	ERROR	datanode/datanode.go:168	there is no alive name node
+2023-03-30T13:13:03.888+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T13:32:53.126+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T13:33:07.882+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T13:41:16.536+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T14:20:49.775+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T14:21:13.454+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T14:28:01.979+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T14:29:11.176+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T14:32:05.239+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T14:35:43.281+0800	ERROR	utils/utils.go:54	failed to listen:  	{"error": "listen tcp :7001: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted."}
+2023-03-30T14:36:34.836+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-30T14:36:52.214+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-31T15:06:12.394+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-31T15:09:18.393+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-31T15:20:39.536+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}
+2023-03-31T15:24:31.874+0800	ERROR	utils/utils.go:54	new encoder error:  	{"error": "cannot create Encoder with less than one data shard or less than zero parity shards"}

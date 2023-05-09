@@ -2,7 +2,6 @@ package tree
 
 import (
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -104,7 +103,6 @@ func (tree *DirTree) FindSubDir(path string) (subDirs []string) {
 
 	//如果目录不存在，应该报错你要查到的目录不存在
 	if parent.Name != ancestors[len(ancestors)-2] {
-		log.Println("你要查找的目录不存在")
 		return
 	}
 
