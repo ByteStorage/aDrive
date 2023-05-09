@@ -558,7 +558,7 @@ func ShowDashboard(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	req.Header.Add("Authorization", "Bearer eyJrIjoiNkhQWEhKNEJTUFZETTBPQmJlcmZPMnAxRmNBMGo5SFEiLCJuIjoiZGZzIiwiaWQiOjF9")
+	req.Header.Add("Authorization", "Bearer ")
 	req.Header.Set("Accept", "text/html")
 	// 发送HTTP请求并读取响应内容
 	client := http.DefaultClient
