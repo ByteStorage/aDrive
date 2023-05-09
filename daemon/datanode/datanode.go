@@ -88,7 +88,7 @@ func StartServer(host, nameNodeAddr string, serverPort int, dataLocation string)
 		zap.L().Error("Failed to read IP response", zap.Error(err))
 	}
 	ipAddress := string(ipBytes)
-	apiUrl := fmt.Sprintf("https://ipinfo.io/%s?token=e299c3c93bdf07", ipAddress)
+	apiUrl := fmt.Sprintf("https://ipinfo.io/%s?token=", ipAddress)
 
 	resp, err := http.Get(apiUrl)
 	if err != nil {
