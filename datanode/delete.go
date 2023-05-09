@@ -8,13 +8,12 @@ import (
 )
 
 func (s *Server) Delete(c context.Context, req *dn.DeleteReq) (*dn.DeleteResp, error) {
-	_, err := os.Open(s.DataDirectory + req.PrePath + req.BlockId)
-	zap.S().Debug("will open: "+s.DataDirectory+req.PrePath+req.BlockId, " required: ", req.PrePath, req.BlockId)
+	_, err := os.Open(s.DataDirectory + req.Filename)
 	if err != nil {
 		zap.S().Debug("文件已经被删掉")
 		return &dn.DeleteResp{Success: true}, nil
 	}
-	err = os.Remove(s.DataDirectory + req.PrePath + req.BlockId)
+	err = os.Remove(s.DataDirectory + req.Filename)
 	if err != nil {
 		return &dn.DeleteResp{}, err
 	}

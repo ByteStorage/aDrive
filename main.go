@@ -1,8 +1,9 @@
 package main
 
 import (
+	"aDrive/main/cli"
 	"aDrive/pkg/logger"
-	"go.uber.org/zap"
+	_ "net/http/pprof"
 	"sync"
 )
 
@@ -15,12 +16,6 @@ func init() {
 }
 
 func main() {
-	zap.L().Debug("debug")
-	zap.L().Info("info")
-	zap.L().Warn("warn")
-	zap.L().Error("error")
-	zap.S().Debug("Debug")
-	zap.S().Info("Info")
-	zap.S().Warn("Warn")
-	zap.S().Error("Error")
+
+	cli.StartServer()
 }

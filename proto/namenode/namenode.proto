@@ -8,14 +8,60 @@ service NameNodeService {
   rpc HeartBeat(HeartBeatReq) returns (HeartBeatResp);
   rpc RegisterDataNode(RegisterDataNodeReq) returns (RegisterDataNodeResp);
   rpc JoinCluster(JoinClusterReq) returns (JoinClusterResp);
+  rpc Delete(DeleteDataReq) returns (DeleteDataResp);
   rpc FindLeader(FindLeaderReq) returns (FindLeaderResp);
+  rpc List(ListReq) returns (ListResp);
   rpc UpdateDataNodeMessage(UpdateDataNodeMessageReq) returns (UpdateDataNodeMessageResp);
   rpc Put(PutReq) returns (PutResp);
+  rpc IsDir(IsDirReq) returns (IsDirResp);
+  rpc Get(GetReq) returns (GetResp);
+  rpc Mkdir(MkdirReq) returns (MkdirResp);
+}
+
+message MkdirReq {
+  string Path = 1;
+}
+
+message MkdirResp {
+}
+
+
+message DeleteDataReq {
+  string fileName = 1;
+}
+
+message DeleteDataResp {
+  bool Ok = 1;
+}
+
+message IsDirReq {
+  string Filename = 1;
+}
+
+message IsDirResp {
+  bool Ok = 1;
+}
+
+message ListResp {
+  repeated string DirName = 1;
+  repeated string FileName = 2;
+}
+
+message ListReq {
+  string ParentPath = 1;
+}
+
+message GetReq {
+  string AbsolutePath = 1;
+}
+
+message GetResp {
+  bytes data = 1;
 }
 
 message PutReq {
   bytes data = 1;
-  string absolutePath = 2;
+  string AbsolutePath = 2;
 }
 
 message PutResp {
@@ -47,6 +93,7 @@ message UpdateDataNodeMessageReq {
   float CpuPercent = 4;
   uint64 TotalMem = 5;
   uint64 TotalDisk = 6;
+  string Place = 7;
 }
 
 message UpdateDataNodeMessageResp {
@@ -60,6 +107,7 @@ message RegisterDataNodeReq{
   float CpuPercent = 4;
   uint64 TotalMem = 5;
   uint64 TotalDisk = 6;
+  string Place = 7;
 }
 
 message RegisterDataNodeResp {
@@ -75,6 +123,6 @@ message HeartBeatResp {
 }
 
 message DataMessage {
-  int64 Id = 1;
+  int32 Id = 1;
   string host = 2;
 }

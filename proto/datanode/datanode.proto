@@ -36,8 +36,7 @@ message StatResp {
 }
 
 message DeleteReq {
-  string BlockId = 1;
-  string PrePath = 2;
+  string filename = 1;
 }
 
 message DeleteResp {
@@ -59,11 +58,6 @@ message HeartBeatReq {
 
 message HeartBeatResp{
   bool Success = 1;
-  uint64 UsedDisk = 2;
-  uint64 UsedMem = 3;
-  float CpuPercent = 4;
-  uint64 TotalMem = 5;
-  uint64 TotalDisk = 6;
 }
 
 message PutReq {
@@ -81,8 +75,7 @@ message PutResp {
 }
 
 message GetReq {
-  string prePath = 2;
-  string BlockId = 1;
+  string AbsolutePath = 1;
 }
 
 message GetResp {

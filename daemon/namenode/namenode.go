@@ -1,6 +1,7 @@
 package namenode
 
 import (
+	"aDrive/main/web"
 	"aDrive/namenode"
 	nn "aDrive/proto/namenode"
 	"context"
@@ -9,12 +10,12 @@ import (
 	"fmt"
 	transport "github.com/Jille/raft-grpc-transport"
 	"github.com/Jille/raftadmin"
-	"github.com/fsnotify/fsnotify"
+	"github.com/gin-contrib/pprof"
+	"github.com/gin-gonic/gin"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/raft"
 	boltdb "github.com/hashicorp/raft-boltdb"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -22,28 +23,41 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
-	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 )
 
-func StartServer(host string, master bool, follow, raftId string, serverPort int, blockSize int, replicationFactor int) {
+var lock sync.Mutex
 
+func StartServer(host string, master bool, follow string, serverPort int) {
+	// 开启pprof，监听请求
+	go func() {
+		router := gin.New()
+		pprof.Register(router)
+		p := fmt.Sprintf(":%d", 6060)
+		if err := router.Run(p); err != nil {
+			log.Println(err)
+		}
+	}()
 	hostname, err := os.Hostname()
 	if err != nil {
 		zap.L().Error("get hostname error", zap.Error(err))
 		os.Exit(1)
 	}
-	if host == "" {
+	if host == "" || host == "localhost" {
 		//为了方便Windows下调试
 		hostname = "localhost"
 	}
-	baseDir := filepath.Join("./Cluster", raftId)
+	id := hostname + strconv.Itoa(serverPort)
+	baseDir := filepath.Join("./Cluster", id)
 	join := filepath.Join(baseDir, "logs.dat")
 
 	zap.L().Info("NameNode port is " + strconv.Itoa(serverPort))
@@ -58,11 +72,30 @@ func StartServer(host string, master bool, follow, raftId string, serverPort int
 	}
 
 	var fsm namenode.Service
-	raftNode, tm, ldb, err := newRaft(baseDir, master, follow, raftId, hostname+addr, &fsm)
+	raftNode, tm, ldb, err := newRaft(baseDir, master, follow, id, hostname+addr, &fsm)
 	if err != nil {
-		zap.L().Info("start raft cluster fail:" + err.Error())
+		zap.L().Error("start raft cluster fail:" + err.Error())
 	}
-	nameNodeInstance := namenode.NewService(raftNode, ldb, uint64(blockSize), uint64(replicationFactor), uint16(serverPort))
+	nameNodeInstance := namenode.NewService(raftNode, ldb, uint16(serverPort))
+
+	if !master {
+		file, err := ioutil.ReadFile("./Cluster/metadata.dat")
+		if err != nil {
+			zap.L().Error("read metadata.dat error", zap.Error(err))
+		}
+		var s namenode.Service
+		err = json.Unmarshal(file, &s)
+		if err != nil {
+			zap.L().Error("unmarshal metadata.dat error", zap.Error(err))
+		}
+		if s.DirTree != nil {
+			nameNodeInstance.DirTree = s.DirTree
+			nameNodeInstance.IdToDataNodes = s.IdToDataNodes
+			nameNodeInstance.FileNameToDataNodes = s.FileNameToDataNodes
+			nameNodeInstance.DataNodeHeartBeat = s.DataNodeHeartBeat
+			nameNodeInstance.DataNodeMessageMap = s.DataNodeMessageMap
+		}
+	}
 
 	// 注册prometheus
 	// Create a metrics registry.
@@ -72,48 +105,16 @@ func StartServer(host string, master bool, follow, raftId string, serverPort int
 	// Register standard server metrics to registry.
 	prometheusReg.MustRegister(grpcMetrics)
 
-	server := grpc.NewServer(
-		grpc.StreamInterceptor(grpcMetrics.StreamServerInterceptor()),
-		grpc.UnaryInterceptor(grpcMetrics.UnaryServerInterceptor()),
-	)
-
+	server := grpc.NewServer()
 	nn.RegisterNameNodeServiceServer(server, nameNodeInstance)
 	tm.Register(server)
 	raftadmin.Register(server, raftNode)
 	reflection.Register(server)
-
-	// Initialize all metrics.
 	grpcMetrics.InitializeMetrics(server)
-
-	// TODO: HARD CODING
-	p := 9092
-	// Start your http server for prometheus.
-	go func() {
-		initErr := errors.New("init")
-
-		for initErr != nil {
-			// Create a HTTP server for prometheus.
-			httpServer := &http.Server{
-				Handler: promhttp.HandlerFor(
-					prometheusReg,
-					promhttp.HandlerOpts{},
-				),
-				// TODO: HARD CODING
-				Addr: ":" + strconv.Itoa(p),
-			}
-
-			p += 1
-
-			initErr = httpServer.ListenAndServe()
-		}
-
-	}()
-
-	zap.L().Info("server for prometheus started on port: " + strconv.Itoa(p-1))
 
 	go func() {
 		if err := server.Serve(listener); err != nil {
-			zap.L().Info("Server Serve failed in " + addr + ",the reason is " + err.Error())
+			zap.L().Error("Server Serve failed in " + addr + ",the reason is " + err.Error())
 			os.Exit(1)
 		}
 	}()
@@ -121,15 +122,13 @@ func StartServer(host string, master bool, follow, raftId string, serverPort int
 	zap.L().Info("NameNode daemon started on port: " + strconv.Itoa(serverPort))
 
 	go func(s *namenode.Service) {
-		for range time.Tick(10 * time.Second) {
+		for range time.Tick(30 * time.Second) {
+			fmt.Println("打印信息方法执行，此时goroutine数量为：", runtime.NumGoroutine())
 			if s.RaftNode == nil {
 				log.Println("节点加入有误，raft未建立成功")
 				continue
 			}
-			id, serverId := raftNode.LeaderWithID()
-			log.Println("当前主节点名称:", id, serverId)
-			log.Println("当前节点的元数据IdToDataNodes信息:", s.IdToDataNodes)
-			log.Println("当前节点的元数据DataNodeHeartBeat信息:", s.DataNodeHeartBeat)
+			zap.L().Debug("", zap.Any("idToDataNodes", s.IdToDataNodes))
 		}
 	}(nameNodeInstance)
 
@@ -143,6 +142,10 @@ func StartServer(host string, master bool, follow, raftId string, serverPort int
 	// 监测datanode的心跳
 	go checkDataNode(nameNodeInstance)
 
+	go sendMessageToProm(nameNodeInstance)
+
+	go web.StartWeb()
+
 	// graceful shutdown
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGKILL)
@@ -153,9 +156,27 @@ func StartServer(host string, master bool, follow, raftId string, serverPort int
 
 }
 
+func sendMessageToProm(s *namenode.Service) {
+	for range time.Tick(15 * time.Second) {
+		fmt.Println("sendMessageToProm方法执行，此时goruoutine数量为：", runtime.NumGoroutine())
+		//将map转换为数组
+		var dataNodeMessages []namenode.DataNodeMessage
+		for _, v := range s.DataNodeMessageMap {
+			dataNodeMessages = append(dataNodeMessages, v)
+			web.UsedMem.Set(float64(v.UsedMem))
+			web.FreeMem.Set(float64(v.TotalMem - v.UsedMem))
+			web.UsedDisk.Set(float64(v.UsedDisk))
+			web.FreeDisk.Set(float64(v.TotalDisk - v.UsedDisk))
+		}
+		for i, v := range dataNodeMessages {
+			web.Place.With(prometheus.Labels{"place": "节点" + strconv.Itoa(i+1) + ":      " + v.Place}).Set(float64(i + 1))
+		}
+	}
+}
+
 // 监听主节点元数据信息变化
 func listenLeaderChanges(filename string, s *namenode.Service) {
-	watcher, err := fsnotify.NewWatcher()
+	/*watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -181,6 +202,8 @@ func listenLeaderChanges(filename string, s *namenode.Service) {
 						zap.L().Error("cannot parse json:" + err.Error())
 					}
 					copyService(s, srv)
+					address, _ := s.RaftNode.LeaderWithID()
+					web.CurrentLeader = string(address)
 					continue
 				}
 			case err := <-watcher.Errors:
@@ -193,11 +216,12 @@ func listenLeaderChanges(filename string, s *namenode.Service) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	<-done
+	<-done*/
 }
 
 func checkDataNode(instance *namenode.Service) {
-	for range time.Tick(time.Millisecond * 3) {
+	for range time.Tick(time.Second * 10) {
+		fmt.Println("checkDataNode方法执行，此时goruoutine数量为：", runtime.NumGoroutine())
 		if instance.RaftNode.State() != raft.Leader {
 			continue
 		}
@@ -213,7 +237,9 @@ func checkDataNode(instance *namenode.Service) {
 				if err != nil {
 					zap.L().Error("cannot redistribute data:" + err.Error())
 				}*/
+				lock.Lock()
 				delete(instance.IdToDataNodes, k)
+				lock.Unlock()
 			}
 		}
 	}
@@ -228,10 +254,8 @@ func newRaft(baseDir string, master bool, follow, myID, myAddress string, fsm ra
 	if master {
 		err := os.RemoveAll("./Cluster")
 		if err != nil {
-
 		}
 	}
-
 	err := os.MkdirAll(baseDir, 0755)
 	if err != nil {
 		return nil, nil, nil, err
@@ -255,11 +279,14 @@ func newRaft(baseDir string, master bool, follow, myID, myAddress string, fsm ra
 
 	r, err := raft.NewRaft(c, fsm, ldb, sdb, fss, tm.Transport())
 	if err != nil {
+		zap.L().Error("cannot create raft:" + err.Error())
 		return nil, nil, nil, fmt.Errorf("raft.NewRaft: %v", err)
 	}
 
-	log.Println("master", master)
 	if master {
+		zap.L().Info("start bootstrap cluster")
+
+		web.CurrentLeader = myAddress
 		cfg := raft.Configuration{
 			Servers: []raft.Server{
 				{
@@ -271,15 +298,20 @@ func newRaft(baseDir string, master bool, follow, myID, myAddress string, fsm ra
 		}
 		f := r.BootstrapCluster(cfg)
 		if err := f.Error(); err != nil {
+			zap.L().Error("bootstrap cluster error:" + err.Error())
 			return nil, nil, nil, fmt.Errorf("raft.Raft.BootstrapCluster: %v", err)
 		}
+		zap.L().Info("bootstrap cluster success,then start web server")
 	} else if follow != "" {
 		findLeader, err := FindLeader(follow)
 		if err != nil {
+			zap.L().Error("cannot find leader:" + err.Error())
 			return nil, nil, nil, err
 		}
+		web.CurrentLeader = findLeader
 		conn, err := grpc.Dial(findLeader, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
+			zap.L().Error("cannot connect to leader:" + err.Error())
 			return nil, nil, nil, err
 		}
 		resp, err := nn.NewNameNodeServiceClient(conn).JoinCluster(context.Background(), &nn.JoinClusterReq{
@@ -288,34 +320,44 @@ func newRaft(baseDir string, master bool, follow, myID, myAddress string, fsm ra
 			PreviousIndex: 0,
 		})
 		if err != nil {
+			zap.L().Error("cannot join cluster:" + err.Error())
 			return nil, nil, nil, err
 		}
 		if resp.Success {
 			log.Println("join the cluster success")
 		}
+
 	}
+
 	return r, tm, ldb, nil
 }
 
 // FindLeader 查找NameNode的Raft集群的Leader
 func FindLeader(addrList string) (string, error) {
+
+	zap.L().Debug(addrList)
 	nameNodes := strings.Split(addrList, ",")
 	var res = ""
+	var conn *grpc.ClientConn
+	defer conn.Close()
+	var err error
 	for _, n := range nameNodes {
-		conn, err := grpc.Dial(n, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err = grpc.Dial(n, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
-			//表明连接不上，继续遍历节点
+			zap.L().Error("cannot connect to:" + n)
+			//表明连接不上，继续	遍历节点
 			continue
 		}
 		resp, err := nn.NewNameNodeServiceClient(conn).FindLeader(context.Background(), &nn.FindLeaderReq{})
 		if err != nil {
+			zap.L().Error("cannot find leader:" + err.Error())
 			continue
 		}
 		res = resp.Addr
 		break
 	}
 	if res == "" {
-		err := errors.New("there is no alive name node")
+		err = errors.New("there is no alive name node")
 		if err != nil {
 			return "", err
 		}
@@ -324,10 +366,9 @@ func FindLeader(addrList string) (string, error) {
 }
 
 func copyService(old *namenode.Service, new namenode.Service) {
-	old.FileNameToBlocks = new.FileNameToBlocks
+	old.FileNameToDataNodes = new.FileNameToDataNodes
 	old.DirTree = new.DirTree
 	old.IdToDataNodes = new.IdToDataNodes
 	old.DataNodeHeartBeat = new.DataNodeHeartBeat
 	old.DataNodeMessageMap = new.DataNodeMessageMap
-	old.BlockToDataNodeIds = new.BlockToDataNodeIds
 }
