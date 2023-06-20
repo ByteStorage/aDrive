@@ -6,7 +6,6 @@ import (
 	dn "aDrive/proto/datanode"
 	nn "aDrive/proto/namenode"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
@@ -15,11 +14,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
-	"io"
 	"io/ioutil"
 	"log"
 	"net"
-	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
@@ -71,7 +68,7 @@ func StartServer(host, nameNodeAddr string, serverPort int, dataLocation string)
 	dataNodeInstance.NameNodeHost = nameNodeHost
 	dataNodeInstance.NameNodePort = uint32(portInt)
 
-	// 获取公网 IP 地址
+	/*// 获取公网 IP 地址
 	ipResp, err := http.Get("https://api.ipify.org")
 	if err != nil {
 		zap.L().Error("Failed to get public IP address", zap.Error(err))
@@ -84,6 +81,7 @@ func StartServer(host, nameNodeAddr string, serverPort int, dataLocation string)
 	}(ipResp.Body)
 
 	ipBytes, err := ioutil.ReadAll(ipResp.Body)
+
 	if err != nil {
 		zap.L().Error("Failed to read IP response", zap.Error(err))
 	}
@@ -99,9 +97,9 @@ func StartServer(host, nameNodeAddr string, serverPort int, dataLocation string)
 		if err != nil {
 			zap.L().Error("Failed to close IP response", zap.Error(err))
 		}
-	}(resp.Body)
+	}(resp.Body)*/
 
-	body, err := ioutil.ReadAll(resp.Body)
+	/*body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}
@@ -111,7 +109,7 @@ func StartServer(host, nameNodeAddr string, serverPort int, dataLocation string)
 		panic(err)
 	}
 	place := data.Country + " " + data.Region + " " + data.City
-	dataNodeInstance.Place = place
+	dataNodeInstance.Place = place*/
 
 	/*go listenLeader(nameNodeAddr, dataNodeInstance)*/
 
@@ -176,7 +174,6 @@ func StartServer(host, nameNodeAddr string, serverPort int, dataLocation string)
 			TotalMem:   totalMem / 1024 / 1024,
 			TotalDisk:  totalDisk / 1024 / 1024,
 			CpuPercent: float32(cpuPercent),
-			Place:      place,
 		})
 		if err != nil {
 			continue
