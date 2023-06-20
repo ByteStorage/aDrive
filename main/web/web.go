@@ -12,7 +12,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"io/ioutil"
 	"log"
@@ -67,7 +66,6 @@ func init() {
 }
 
 func StartWeb() {
-	initDatabase()
 	store := cookie.NewStore([]byte("secret"))
 	r := gin.Default()
 	//设置跨域访问
@@ -575,18 +573,6 @@ func ShowDashboard(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": string(body),
 	})
-}
-
-func initDatabase() {
-	db, err := gorm.Open(mysql.Open(""), &gorm.Config{})
-	if err != nil {
-		panic("application start fail")
-	}
-	DB = db
-	err = db.AutoMigrate(&User{})
-	if err != nil {
-		panic(err)
-	}
 }
 
 type User struct {

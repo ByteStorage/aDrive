@@ -52,10 +52,9 @@ func Init() {
 		c1 = zapcore.NewCore(encoder, getFileWriter(LOG_LOCATION), level)
 		c2 = zapcore.NewCore(encoder, getFileWriter(ERROR_LOG_LOCATION), zap.ErrorLevel)
 	} else {
-		// STD ONLY
-		c1 = zapcore.NewCore(encoder, getWriter(), level)
-		// STD and FILE
-		c2 = zapcore.NewCore(encoder, getWriterWithFile(ERROR_LOG_LOCATION), zap.ErrorLevel)
+		// FILE ONLY
+		c1 = zapcore.NewCore(encoder, getFileWriter(LOG_LOCATION), level)
+		c2 = zapcore.NewCore(encoder, getFileWriter(ERROR_LOG_LOCATION), zap.ErrorLevel)
 	}
 
 	core := zapcore.NewTee(c1, c2)

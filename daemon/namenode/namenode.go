@@ -123,7 +123,6 @@ func StartServer(host string, master bool, follow string, serverPort int) {
 
 	go func(s *namenode.Service) {
 		for range time.Tick(30 * time.Second) {
-			fmt.Println("打印信息方法执行，此时goroutine数量为：", runtime.NumGoroutine())
 			if s.RaftNode == nil {
 				log.Println("节点加入有误，raft未建立成功")
 				continue
