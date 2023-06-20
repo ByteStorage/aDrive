@@ -11,6 +11,7 @@ import (
 func StartServer() {
 	dataNodeCommand := flag.NewFlagSet("datanode", flag.ExitOnError)
 	nameNodeCommand := flag.NewFlagSet("namenode", flag.ExitOnError)
+	clientCommand := flag.NewFlagSet("client", flag.ExitOnError)
 
 	nameNodeAddr := dataNodeCommand.String("namenode", "116.62.156.91:9999", "NameNode communication port")
 	dataport := dataNodeCommand.Int("port", 7000, "")
@@ -35,5 +36,9 @@ func StartServer() {
 	case "namenode":
 		_ = nameNodeCommand.Parse(os.Args[2:])
 		namenode.StartServer(*host, *master, *follow, *port)
+
+	case "client":
+		_ = clientCommand.Parse(os.Args[2:])
+
 	}
 }
