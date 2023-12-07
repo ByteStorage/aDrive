@@ -38,7 +38,9 @@ func (s *Service) List(c context.Context, req *nn.ListReq) (*nn.ListResp, error)
 		log.Println("cannot marshal data")
 		return &nn.ListResp{}, err
 	}
-	s.RaftNode.Apply(bytes, time.Second*1)
+	if s.RaftNode != nil {
+		s.RaftNode.Apply(bytes, time.Second*1)
+	}
 	return &nn.ListResp{
 		FileName: fileNameList,
 		DirName:  dirNameList,

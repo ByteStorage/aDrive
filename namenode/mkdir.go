@@ -49,6 +49,8 @@ func (s *Service) Mkdir(c context.Context, req *nn.MkdirReq) (*nn.MkdirResp, err
 		log.Println("cannot marshal data")
 		return &nn.MkdirResp{}, err
 	}
-	s.RaftNode.Apply(bytes, time.Second*1)
+	if s.RaftNode != nil {
+		s.RaftNode.Apply(bytes, time.Second*1)
+	}
 	return &nn.MkdirResp{}, nil
 }

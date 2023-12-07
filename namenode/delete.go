@@ -51,6 +51,8 @@ func (s *Service) Delete(c context.Context, req *nn.DeleteDataReq) (*nn.DeleteDa
 		log.Println("cannot marshal data")
 		return &nn.DeleteDataResp{}, err
 	}
-	s.RaftNode.Apply(bytes, time.Second*1)
+	if s.RaftNode != nil {
+		s.RaftNode.Apply(bytes, time.Second*1)
+	}
 	return &res, nil
 }

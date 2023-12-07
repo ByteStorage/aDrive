@@ -18,7 +18,9 @@ func (s *Service) IsDir(c context.Context, req *nn.IsDirReq) (*nn.IsDirResp, err
 		log.Println("cannot marshal data")
 		return &nn.IsDirResp{}, err
 	}
-	s.RaftNode.Apply(bytes, time.Second*1)
+	if s.RaftNode != nil {
+		s.RaftNode.Apply(bytes, time.Second*1)
+	}
 	if len(dir) == 0 {
 		return &nn.IsDirResp{Ok: false}, nil
 	} else {

@@ -20,7 +20,9 @@ func (s *Service) FindLeader(c context.Context, req *nn.FindLeaderReq) (*nn.Find
 		log.Println("cannot marshal data")
 		return &nn.FindLeaderResp{}, err
 	}
-	s.RaftNode.Apply(bytes, time.Second*1)
+	if s.RaftNode != nil {
+		s.RaftNode.Apply(bytes, time.Second*1)
+	}
 	return &nn.FindLeaderResp{
 		Addr: string(id),
 	}, nil
@@ -37,6 +39,8 @@ func (s *Service) JoinCluster(c context.Context, req *nn.JoinClusterReq) (*nn.Jo
 		log.Println("cannot marshal data")
 		return &nn.JoinClusterResp{}, err
 	}
-	s.RaftNode.Apply(bytes, time.Second*1)
+	if s.RaftNode != nil {
+		s.RaftNode.Apply(bytes, time.Second*1)
+	}
 	return &nn.JoinClusterResp{Success: true}, nil
 }

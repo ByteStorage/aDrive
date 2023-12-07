@@ -1,15 +1,27 @@
 package cmd
 
-import (
-	"aDrive/cmd/namenode"
-	"github.com/spf13/cobra"
-)
+import "github.com/desertbit/grumble"
 
-func NewNameNodeServerCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "namenode",
-		Short: "namenode operations",
-	}
-	cmd.AddCommand(namenode.NewNameNodeStartCmd())
-	return cmd
+func addNameNode(c *grumble.Context) error {
+	return nil
+}
+
+func addDataNode(c *grumble.Context) error {
+	return nil
+}
+
+func rmNameNode(c *grumble.Context) error {
+	return nil
+}
+
+func rmDataNode(c *grumble.Context) error {
+	return nil
+}
+
+func lsNameNode(c *grumble.Context) error {
+	return nil
+}
+
+func lsDataNode(c *grumble.Context) error {
+	return nil
 }

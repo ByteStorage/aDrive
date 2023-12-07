@@ -1,6 +1,7 @@
 package api
 
 import (
+	"aDrive/daemon/namenode"
 	nn "aDrive/proto/namenode"
 	"context"
 	"errors"
@@ -8,24 +9,32 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 )
+
+var ApiService = &Service{}
 
 type Service struct {
 	NameNodeHost string
 	NameNodePort string
 }
 
-func initApi(nameNodeAddress string) (*grpc.ClientConn, error) {
-	s := new(Service)
-	go listenLeader(s, nameNodeAddress)
-	for true {
-		if s.NameNodeHost != "" {
+func InitApi(nameNodeAddress string) (*grpc.ClientConn, error) {
+	address := strings.Split(nameNodeAddress, ",")
+	if len(address) >= 3 {
+		go listenLeader(ApiService, nameNodeAddress)
+	} else {
+		ApiService.NameNodePort = strconv.Itoa(namenode.DefaultNameNodePort)
+		ApiService.NameNodeHost = address[0]
+	}
+	for {
+		if ApiService.NameNodeHost != "" {
 			break
 		}
 	}
-	return grpc.Dial(s.NameNodeHost+":"+s.NameNodePort, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	return grpc.Dial(ApiService.NameNodeHost+":"+ApiService.NameNodePort, grpc.WithTransportCredentials(insecure.NewCredentials()))
 }
 
 func listenLeader(s *Service, address string) {

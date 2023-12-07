@@ -47,6 +47,8 @@ type Service struct {
 	RaftNode            *raft.Raft
 	RaftLog             *boltdb.BoltStore
 	Log                 *wal.Log
+	Peer                []string
+	Leader              string
 }
 
 type DataMessage struct {
@@ -92,7 +94,9 @@ func (s *Service) HeartBeat(c context.Context, req *nn.HeartBeatReq) (*nn.HeartB
 		log.Println("cannot marshal data")
 		return &nn.HeartBeatResp{}, err
 	}
-	s.RaftNode.Apply(bytes, time.Second*1)
+	if s.RaftNode != nil {
+		s.RaftNode.Apply(bytes, time.Second*1)
+	}
 	return &nn.HeartBeatResp{Success: true}, nil
 }
 
@@ -132,6 +136,8 @@ func (s *Service) UpdateDataNodeMessage(c context.Context, req *nn.UpdateDataNod
 		log.Println("cannot marshal data")
 		return &nn.UpdateDataNodeMessageResp{}, err
 	}
-	s.RaftNode.Apply(bytes, time.Second*1)
+	if s.RaftNode != nil {
+		s.RaftNode.Apply(bytes, time.Second*1)
+	}
 	return &nn.UpdateDataNodeMessageResp{Success: true}, nil
 }

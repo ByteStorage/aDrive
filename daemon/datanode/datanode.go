@@ -20,12 +20,122 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
-	"runtime"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
 )
+
+const (
+	DefaultDataNodePort = 7000
+	DefaultNameNodePort = 9999
+)
+
+func Start() {
+	nameNodeAddr := "localhost:" + strconv.Itoa(DefaultNameNodePort)
+	dataLocation := "data/"
+	dataNodeInstance := new(datanode.Server)
+	if !strings.HasSuffix(dataLocation, "/") {
+		dataLocation = dataLocation + "/"
+	}
+	_, err := ioutil.ReadDir(dataLocation)
+	if err != nil {
+		err := os.MkdirAll(dataLocation, 0755)
+		if utils.Exit("create dir error", err) {
+			return
+		}
+	}
+	dataNodeInstance.DataDirectory = dataLocation
+	dataNodeInstance.ServicePort = uint32(DefaultDataNodePort)
+	nameNodeHost, nameNodePort, err := net.SplitHostPort(nameNodeAddr)
+	if err != nil {
+		panic(err)
+	}
+	portInt, err := strconv.Atoi(nameNodePort)
+	if err != nil {
+		panic(err)
+	}
+	dataNodeInstance.NameNodeHost = nameNodeHost
+	dataNodeInstance.NameNodePort = uint32(portInt)
+	zap.L().Info("Data storage location is " + dataLocation)
+
+	addr := ":" + strconv.Itoa(DefaultDataNodePort)
+
+	listener, err := net.Listen("tcp", addr)
+	if utils.Exit("failed to listen", err) {
+		return
+	}
+
+	server := grpc.NewServer()
+	dn.RegisterDataNodeServer(server, dataNodeInstance)
+
+	grpc_health_v1.RegisterHealthServer(server, health.NewServer())
+
+	go func() {
+		if err := server.Serve(listener); err != nil {
+			log.Printf(fmt.Sprintf("Server Serve failed in %s", addr), "err", err.Error())
+			panic(err)
+		}
+	}()
+	zap.L().Info("start register to name nodes: " + nameNodeAddr)
+	for {
+		//向NameNode注册
+		if dataNodeInstance.NameNodeHost == "" {
+			continue
+		}
+		conn, err := grpc.Dial(nameNodeAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			continue
+		}
+		usedMem, err := datanode.GetUsedMem()
+		if err != nil {
+
+		}
+		usedDisk, err := datanode.GetUsedDisk()
+		if err != nil {
+
+		}
+		totalMem, err := datanode.GetTotalMem()
+		if err != nil {
+
+		}
+		totalDisk, err := datanode.GetTotalDisk()
+		if err != nil {
+
+		}
+		cpuPercent, err := datanode.GetCpuPercent()
+		if err != nil {
+
+		}
+		resp, err := nn.NewNameNodeServiceClient(conn).RegisterDataNode(context.Background(), &nn.RegisterDataNodeReq{
+			Addr:       "localhost:" + strconv.Itoa(int(dataNodeInstance.ServicePort)),
+			UsedDisk:   usedDisk / 1024 / 1024,
+			UsedMem:    usedMem / 1024 / 1024,
+			TotalMem:   totalMem / 1024 / 1024,
+			TotalDisk:  totalDisk / 1024 / 1024,
+			CpuPercent: float32(cpuPercent),
+		})
+		if err != nil {
+			continue
+		}
+		if resp.Success {
+			zap.L().Info("register success")
+			break
+		}
+	}
+
+	zap.L().Info("DataNode daemon started on port: " + strconv.Itoa(DefaultDataNodePort))
+
+	go heartBeatToNameNode(dataNodeInstance, strconv.Itoa(DefaultDataNodePort))
+
+	// graceful shutdown
+	sig := make(chan os.Signal)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGKILL)
+
+	<-sig
+
+	server.GracefulStop()
+}
 
 func StartServer(host, nameNodeAddr string, serverPort int, dataLocation string) {
 	// 开启pprof，监听请求
@@ -242,10 +352,8 @@ func heartBeatToNameNode(instance *datanode.Server, host string) {
 	i := 0
 	for range time.Tick(time.Second * 10) {
 		var conn *grpc.ClientConn
-		fmt.Println("heartBeatToNameNode方法执行，此时goroutine数量为：", runtime.NumGoroutine())
 		i++
 		addr := instance.NameNodeHost + ":" + strconv.Itoa(int(instance.NameNodePort))
-		log.Println("heart beat to name node: " + addr)
 		conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			zap.L().Info("moving to new name node")

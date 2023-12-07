@@ -4,3 +4,17 @@
 2022-12-22T15:47:31.334+0800	INFO	aDrive/main.go:29	Info
 2022-12-22T15:47:31.334+0800	WARN	aDrive/main.go:30	Warn
 2022-12-22T15:47:31.334+0800	ERROR	aDrive/main.go:31	Error
+2023-11-13T23:27:43.480+0800	INFO	datanode/datanode.go:61	Data storage location is data/
+2023-11-13T23:27:43.481+0800	INFO	datanode/datanode.go:81	start register to name nodes: localhost:9999
+2023-11-13T23:28:43.455+0800	INFO	datanode/datanode.go:61	Data storage location is data/
+2023-11-13T23:28:43.456+0800	INFO	datanode/datanode.go:81	start register to name nodes: localhost:9999
+2023-11-13T23:28:44.458+0800	INFO	datanode/datanode.go:123	register success
+2023-11-13T23:28:44.458+0800	INFO	datanode/datanode.go:128	DataNode daemon started on port: 7000
+2023-11-13T23:32:01.983+0800	INFO	datanode/datanode.go:61	Data storage location is data/
+2023-11-13T23:32:01.983+0800	INFO	datanode/datanode.go:81	start register to name nodes: localhost:9999
+2023-11-13T23:32:02.985+0800	INFO	datanode/datanode.go:123	register success
+2023-11-13T23:32:02.985+0800	INFO	datanode/datanode.go:128	DataNode daemon started on port: 7000
+2023-11-13T23:34:02.348+0800	INFO	datanode/datanode.go:60	Data storage location is data/
+2023-11-13T23:34:02.348+0800	INFO	datanode/datanode.go:80	start register to name nodes: localhost:9999
+2023-11-13T23:34:03.350+0800	INFO	datanode/datanode.go:122	register success
+2023-11-13T23:34:03.350+0800	INFO	datanode/datanode.go:127	DataNode daemon started on port: 7000

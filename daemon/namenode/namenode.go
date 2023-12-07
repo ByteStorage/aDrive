@@ -35,7 +35,36 @@ import (
 	"time"
 )
 
+const (
+	DefaultNameNodePort = 9999
+)
+
 var lock sync.Mutex
+
+func Start() {
+	addr := ":" + strconv.Itoa(DefaultNameNodePort)
+	listener, err := net.Listen("tcp", addr)
+	if err != nil {
+		zap.L().Error("listen error", zap.Error(err))
+		os.Exit(1)
+	}
+	nameNodeInstance := namenode.NewService(nil, nil, DefaultNameNodePort)
+	server := grpc.NewServer()
+	nn.RegisterNameNodeServiceServer(server, nameNodeInstance)
+	go func() {
+		if err := server.Serve(listener); err != nil {
+			zap.L().Error("Server Serve failed in " + addr + ",the reason is " + err.Error())
+			os.Exit(1)
+		}
+	}()
+	// graceful shutdown
+	sig := make(chan os.Signal)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGKILL)
+
+	<-sig
+
+	server.GracefulStop()
+}
 
 func StartServer(host string, master bool, follow string, serverPort int) {
 	// 开启pprof，监听请求
